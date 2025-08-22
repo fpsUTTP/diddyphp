@@ -1,6 +1,7 @@
+# Use PHP 7.4 with Apache
 FROM php:7.4-apache
 
-# Install dependencies
+# Install PHP extensions and dependencies
 RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     libpng-dev \
@@ -10,19 +11,23 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install gd mysqli pdo pdo_mysql \
     && apt-get clean
 
-# Enable Apache mod_rewrite
+# Enable Apache mod_rewrite for Gallery URLs
 RUN a2enmod rewrite
 
+# Set working directory
 WORKDIR /var/www/html
 
+# Copy all application files
 COPY . .
 
-# Create var folder and set permissions
+# Create 'var' folder and set permissions
 RUN mkdir -p /var/www/html/var \
     && chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html \
     && chmod -R 777 /var/www/html/var
 
+# Expose port 8080 for Render
 EXPOSE 8080
 
+# Start Apache
 CMD ["apache2-foreground"]
